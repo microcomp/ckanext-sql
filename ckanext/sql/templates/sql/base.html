@@ -1,0 +1,107 @@
+{% extends "page.html" %}
+{% block subtitle %}{{ _('CKAN - SQL query builder') }}{% endblock %}
+{% block breadcrumb_content %}
+<li><a href="{{ h.url_for(controller='ckanext.sql.controller:SqlController', action='index') }}">{{ _('SQL query builder') }}</a></li>
+{% endblock %}
+{% block primary %}
+<link rel="stylesheet" type="text/css" href="query_builder/css/query-builder.default.min.css"/>
+<script src="query_builder/js/query-builder.standalone.min.js"></script>
+<div class="col-md-12 col-lg-10 col-lg-offset-1">
+<div id="builder-basic"></div>
+<div class="btn-group">
+<button class="btn btn-warning reset" data-target="builder-basic">Reset</button>
+<button class="btn btn-success set-json" data-target="builder-basic">Set rules</button>
+<button class="btn btn-primary parse-json" data-target="builder-basic">Get rules</button>
+</div>
+</div>
+<script>
+var rules_basic = {
+		  condition: 'AND',
+		  rules: [{
+		    id: 'price',
+		    operator: 'less',
+		    value: 10.25
+		  }, {
+		    condition: 'OR',
+		    rules: [{
+		      id: 'category',
+		      operator: 'equal',
+		      value: 2
+		    }, {
+		      id: 'category',
+		      operator: 'equal',
+		      value: 1
+		    }]
+		  }]
+		};
+
+		$('#builder-basic').queryBuilder({
+		  
+		  filters: [{
+		    id: 'name',
+		    label: 'Name',
+		    type: 'string'
+		  }, {
+		    id: 'category',
+		    label: 'Category',
+		    type: 'integer',
+		    input: 'select',
+		    values: {
+		      1: 'Books',
+		      2: 'Movies',
+		      3: 'Music',
+		      4: 'Tools',
+		      5: 'Goodies',
+		      6: 'Clothes'
+		    },
+		    operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+		  }, {
+		    id: 'in_stock',
+		    label: 'In stock',
+		    type: 'integer',
+		    input: 'radio',
+		    values: {
+		      1: 'Yes',
+		      0: 'No'
+		    },
+		    operators: ['equal']
+		  }, {
+		    id: 'price',
+		    label: 'Price',
+		    type: 'double',
+		    validation: {
+		      min: 0,
+		      step: 0.01
+		    }
+		  }, {
+		    id: 'id',
+		    label: 'Identifier',
+		    type: 'string',
+		    placeholder: '____-____-____',
+		    operators: ['equal', 'not_equal'],
+		    validation: {
+		      format: /^.{4}-.{4}-.{4}$/
+		    }
+		  }],
+
+		  rules: rules_basic
+		});
+		$('#btn-reset').on('click', function() {
+		  $('#builder-basic').queryBuilder('reset');
+		});
+
+		$('#btn-set').on('click', function() {
+		  $('#builder-basic').queryBuilder('setRules', rules_basic);
+		});
+
+		$('#btn-get').on('click', function() {
+		  var result = $('#builder-basic').queryBuilder('getRules');
+		  
+		  if (!$.isEmptyObject(result)) {
+		    alert(JSON.stringify(result, null, 2));
+		  }
+		});
+</script>
+{% endblock %}
+{% block secondary_content %}
+{% endblock %}
